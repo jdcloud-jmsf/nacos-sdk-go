@@ -30,7 +30,9 @@ import (
 func main() {
 	//create ServerConfig
 	sc := []constant.ServerConfig{
-		*constant.NewServerConfig("127.0.0.1", 8848, constant.WithContextPath("/nacos")),
+		*constant.NewServerConfig("11.50.138.130", 30368,
+			constant.WithContextPath("/nacos"),
+			constant.WithGrpcPort(31138)),
 	}
 
 	//create ClientConfig
@@ -41,6 +43,8 @@ func main() {
 		constant.WithLogDir("/tmp/nacos/log"),
 		constant.WithCacheDir("/tmp/nacos/cache"),
 		constant.WithLogLevel("debug"),
+		constant.WithUsername("nacos"),
+		constant.WithPassword("nacos"),
 	)
 
 	// create naming client
@@ -55,6 +59,8 @@ func main() {
 		panic(err)
 	}
 
+	getNamespaces(client)
+
 	//Register
 	registerServiceInstance(client, vo.RegisterInstanceParam{
 		Ip:          "10.0.0.10",
@@ -64,6 +70,20 @@ func main() {
 		ClusterName: "cluster-a",
 		Weight:      10,
 		Enable:      true,
+		Healthy:     true,
+		Ephemeral:   true,
+		Metadata:    map[string]string{"idc": "shanghai"},
+	})
+
+	//Register
+	updateServiceInstance(client, vo.UpdateInstanceParam{
+		Ip:          "10.0.0.10",
+		Port:        8848,
+		ServiceName: "demo.go",
+		GroupName:   "group-a",
+		ClusterName: "cluster-a",
+		Weight:      10,
+		Enable:      false,
 		Healthy:     true,
 		Ephemeral:   true,
 		Metadata:    map[string]string{"idc": "shanghai"},
@@ -150,6 +170,8 @@ func main() {
 		},
 	}
 	subscribe(client, subscribeParam)
+
+	getCatalogServices(client, "public")
 
 	//wait for client pull change from server
 	time.Sleep(3 * time.Second)

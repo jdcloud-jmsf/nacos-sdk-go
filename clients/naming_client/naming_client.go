@@ -352,7 +352,7 @@ func (sc *NamingClient) GetAllNamespaces() ([]model.Namespace, error) {
 }
 
 // GetCatalogServices ...
-func (sc *NamingClient) GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error) {
+func (sc *NamingClient) GetCatalogServices(namespace string) (model.CatalogServiceList, error) {
 	if len(namespace) == 0 {
 		namespace = constant.DEFAULT_NAMESPACE_ID
 	}

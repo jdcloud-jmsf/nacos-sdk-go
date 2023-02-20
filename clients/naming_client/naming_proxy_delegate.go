@@ -37,6 +37,18 @@ type NamingProxyDelegate struct {
 	serviceInfoHolder *naming_cache.ServiceInfoHolder
 }
 
+func (proxy *NamingProxyDelegate) UpdateInstance(serviceName string, groupName string, instance model.Instance) (bool, error) {
+	return proxy.httpClientProxy.UpdateInstance(serviceName, groupName, instance)
+}
+
+func (proxy *NamingProxyDelegate) GetAllNamespaces() ([]model.Namespace, error) {
+	return proxy.httpClientProxy.GetAllNamespaces()
+}
+
+func (proxy *NamingProxyDelegate) GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error) {
+	return proxy.httpClientProxy.GetCatalogServices(namespace, pageNo, pageSize)
+}
+
 func NewNamingProxyDelegate(ctx context.Context, clientCfg constant.ClientConfig, serverCfgs []constant.ServerConfig,
 	httpAgent http_agent.IHttpAgent, serviceInfoHolder *naming_cache.ServiceInfoHolder) (naming_proxy.INamingProxy, error) {
 

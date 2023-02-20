@@ -119,5 +119,5 @@ type INamingClient interface {
 	GetAllNamespaces() ([]model.Namespace, error)
 
 	//GetCatalogServices get all services from the Nacos catalog
-	GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error)
+	GetCatalogServices(namespace string) (model.CatalogServiceList, error)
 }

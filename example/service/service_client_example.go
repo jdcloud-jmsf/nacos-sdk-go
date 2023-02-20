@@ -103,3 +103,19 @@ func getAllService(client naming_client.INamingClient, param vo.GetAllServiceInf
 	}
 	fmt.Printf("GetAllService,param:%+v, result:%+v \n\n", param, service)
 }
+
+func getNamespaces(client naming_client.INamingClient) {
+	naList, err := client.GetAllNamespaces()
+	if err != nil {
+		panic("GetAllNamespaces failed!")
+	}
+	fmt.Printf("GetAllService, result:%+v \n\n", naList)
+}
+
+func getCatalogServices(client naming_client.INamingClient, namespace string) {
+	naList, err := client.GetCatalogServices(namespace)
+	if err != nil {
+		panic("GetAllNamespaces failed!")
+	}
+	fmt.Printf("GetAllService,result:%+v \n\n", naList)
+}

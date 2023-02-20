@@ -290,7 +290,7 @@ func (proxy *NamingHttpProxy) GetCatalogServices(namesSpace string, pageNo, page
 	}
 	e = json.Unmarshal([]byte(result), &data)
 	if e != nil {
-		logger.Errorf("GetCatalogServices result json.Unmarshal error! namespace:%s", namesSpace)
+		logger.Errorf("GetCatalogServices result json.Unmarshal error! namespace:%s err:%+v", namesSpace, e)
 		return data, e
 	}
 

@@ -129,6 +129,19 @@ func (proxy *NamingGrpcProxy) DeregisterInstance(serviceName string, groupName s
 	return response.IsSuccess(), err
 }
 
+func (proxy *NamingGrpcProxy) UpdateInstance(serviceName string, groupName string, instance model.Instance) (bool, error) {
+	logger.Infof("update instance namespaceId:<%s>,serviceName:<%s> with instance:<%s>",
+		proxy.clientConfig.NamespaceId, serviceName, util.ToJsonString(instance))
+	instanceRequest := rpc_request.NewInstanceRequest(proxy.clientConfig.NamespaceId, serviceName, groupName, "registerInstance", instance)
+	response, err := proxy.requestToServer(instanceRequest)
+	if err != nil {
+		return false, err
+	}
+	return response.IsSuccess(), err
+	//TODO implement me
+	panic("implement me")
+}
+
 // GetServiceList ...
 func (proxy *NamingGrpcProxy) GetServiceList(pageNo uint32, pageSize uint32, groupName, namespaceId string, selector *model.ExpressionSelector) (model.ServiceList, error) {
 	var selectorStr string
@@ -196,4 +209,14 @@ func (proxy *NamingGrpcProxy) Unsubscribe(serviceName, groupName, clusters strin
 
 func (proxy *NamingGrpcProxy) CloseClient() {
 	proxy.rpcClient.GetRpcClient().Shutdown()
+}
+
+func (proxy *NamingGrpcProxy) GetAllNamespaces() ([]model.Namespace, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (proxy *NamingGrpcProxy) GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error) {
+	//TODO implement me
+	panic("implement me")
 }
