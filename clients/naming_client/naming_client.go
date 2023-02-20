@@ -179,7 +179,7 @@ func (sc *NamingClient) UpdateInstance(param vo.UpdateInstanceParam) (bool, erro
 		Ephemeral:   param.Ephemeral,
 	}
 
-	return sc.serviceProxy.RegisterInstance(param.ServiceName, param.GroupName, instance)
+	return sc.serviceProxy.UpdateInstance(param.ServiceName, param.GroupName, instance)
 
 }
 
@@ -344,4 +344,17 @@ func (sc *NamingClient) Unsubscribe(param *vo.SubscribeParam) (err error) {
 func (sc *NamingClient) CloseClient() {
 	sc.serviceProxy.CloseClient()
 	sc.cancel()
+}
+
+// GetAllNamespaces ...
+func (sc *NamingClient) GetAllNamespaces() ([]model.Namespace, error) {
+	return sc.serviceProxy.GetAllNamespaces()
+}
+
+// GetCatalogServices ...
+func (sc *NamingClient) GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error) {
+	if len(namespace) == 0 {
+		namespace = constant.DEFAULT_NAMESPACE_ID
+	}
+	return sc.serviceProxy.GetCatalogServices(namespace, 1, 10000)
 }

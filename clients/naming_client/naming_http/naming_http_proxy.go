@@ -18,6 +18,7 @@ package naming_http
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -121,6 +122,31 @@ func (proxy *NamingHttpProxy) DeregisterInstance(serviceName string, groupName s
 	return true, nil
 }
 
+// UpdateInstance ...
+func (proxy *NamingHttpProxy) UpdateInstance(serviceName string, groupName string, instance model.Instance) (bool, error) {
+	logger.Infof("update instance namespaceId:<%s>,serviceName:<%s> with instance:<%s>",
+		proxy.clientConfig.NamespaceId, serviceName, util.ToJsonString(instance))
+	serviceName = util.GetGroupName(serviceName, groupName)
+	params := map[string]string{}
+	params["namespaceId"] = proxy.clientConfig.NamespaceId
+	params["serviceName"] = serviceName
+	params["groupName"] = groupName
+	params["app"] = proxy.clientConfig.AppName
+	params["clusterName"] = instance.ClusterName
+	params["ip"] = instance.Ip
+	params["port"] = strconv.Itoa(int(instance.Port))
+	params["weight"] = strconv.FormatFloat(instance.Weight, 'f', -1, 64)
+	params["enable"] = strconv.FormatBool(instance.Enable)
+	params["healthy"] = strconv.FormatBool(instance.Healthy)
+	params["metadata"] = util.ToJsonString(instance.Metadata)
+	params["ephemeral"] = strconv.FormatBool(instance.Ephemeral)
+	_, err := proxy.nacosServer.ReqApi(constant.SERVICE_PATH, params, http.MethodPut, proxy.clientConfig)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // GetServiceList ...
 func (proxy *NamingHttpProxy) GetServiceList(pageNo uint32, pageSize uint32, groupName, namespaceId string, selector *model.ExpressionSelector) (model.ServiceList, error) {
 	params := map[string]string{}
@@ -216,4 +242,57 @@ func (proxy *NamingHttpProxy) Unsubscribe(serviceName, groupName, clusters strin
 
 func (proxy *NamingHttpProxy) CloseClient() {
 
+}
+
+// GetAllNamespaces ...
+func (proxy *NamingHttpProxy) GetAllNamespaces() ([]model.Namespace, error) {
+	data := make([]model.Namespace, 0)
+	param := make(map[string]string)
+	api := constant.NAMESPACE_PATH
+	result, e := proxy.nacosServer.ReqApi(api, param, http.MethodGet, proxy.clientConfig)
+	if e != nil {
+		logger.Errorf("GetAllNamespaces return error! err:%+v", e)
+		return data, e
+	}
+
+	tempData := struct {
+		Code    int32             `json:"code"`
+		Message string            `json:"message"`
+		Data    []model.Namespace `json:"data"`
+	}{}
+	e = json.Unmarshal([]byte(result), &tempData)
+	if e != nil {
+		logger.Errorf("GetAllNamespaces result json.Unmarshal error!")
+		return data, e
+	}
+	if tempData.Code != 200 {
+		logger.Errorf("GetAllNamespaces failed!code:%v message:%s", tempData.Code, tempData.Message)
+	}
+	data = tempData.Data
+	return data, nil
+}
+
+//GetCatalogServices get all services from the Nacos catalog
+func (proxy *NamingHttpProxy) GetCatalogServices(namesSpace string, pageNo, pageSize uint32) (model.CatalogServiceList, error) {
+	data := model.CatalogServiceList{}
+	if len(namesSpace) == 0 {
+		namesSpace = constant.DEFAULT_NAMESPACE_ID
+	}
+	param := make(map[string]string)
+	param["namespaceId"] = namesSpace
+	param["pageNo"] = strconv.Itoa(int(pageNo))
+	param["pageSize"] = strconv.Itoa(int(pageSize))
+	api := constant.CATALOG_SERVICE_PATH
+	result, e := proxy.nacosServer.ReqApi(api, param, http.MethodGet, proxy.clientConfig)
+	if e != nil {
+		logger.Errorf("GetAllNamespaces return error! err:%+v", e)
+		return data, e
+	}
+	e = json.Unmarshal([]byte(result), &data)
+	if e != nil {
+		logger.Errorf("GetCatalogServices result json.Unmarshal error! namespace:%s", namesSpace)
+		return data, e
+	}
+
+	return data, nil
 }

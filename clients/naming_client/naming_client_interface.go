@@ -114,4 +114,10 @@ type INamingClient interface {
 
 	//CloseClient close the GRPC client
 	CloseClient()
+
+	//GetAllNamespaces get all namespaces
+	GetAllNamespaces() ([]model.Namespace, error)
+
+	//GetCatalogServices get all services from the Nacos catalog
+	GetCatalogServices(namespace string, pageNo, pageSize uint32) (model.CatalogServiceList, error)
 }

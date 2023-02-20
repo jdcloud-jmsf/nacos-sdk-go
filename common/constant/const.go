@@ -53,6 +53,8 @@ const (
 	SERVICE_INFO_PATH           = SERVICE_BASE_PATH + "/service"
 	SERVICE_SUBSCRIBE_PATH      = SERVICE_PATH + "/list"
 	NAMESPACE_PATH              = "/v1/console/namespaces"
+	CATALOG_PATH                = "/v1/ns/catalog"
+	CATALOG_SERVICE_PATH        = CATALOG_PATH + "/services"
 	SPLIT_CONFIG                = string(rune(1))
 	SPLIT_CONFIG_INNER          = string(rune(2))
 	KEY_LISTEN_CONFIGS          = "Listening-Configs"
