@@ -76,10 +76,10 @@ func (ed *SubscribeCallback) ServiceChanged(cacheKey string, service *model.Serv
 	if ok {
 		for _, funcItem := range funcs.([]*func(service string, services []model.Instance, err error)) {
 			if len(service.Hosts) == 0 {
-				(*funcItem)(service.Name, service.Hosts, errors.New("[client.Subscribe] subscribe failed,hosts is empty"))
+				(*funcItem)(service.GroupName+"@@"+service.Name, service.Hosts, errors.New("[client.Subscribe] subscribe failed,hosts is empty"))
 				continue
 			}
-			(*funcItem)(service.Name, service.Hosts, nil)
+			(*funcItem)(service.GroupName+"@@"+service.Name, service.Hosts, nil)
 		}
 	}
 }
