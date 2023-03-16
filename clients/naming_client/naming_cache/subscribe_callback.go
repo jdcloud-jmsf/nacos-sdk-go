@@ -42,26 +42,26 @@ func (ed *SubscribeCallback) IsSubscribed(serviceName, clusters string) bool {
 	return ok
 }
 
-func (ed *SubscribeCallback) AddCallbackFunc(serviceName string, clusters string, callbackFunc *func(services []model.Instance, err error)) {
+func (ed *SubscribeCallback) AddCallbackFunc(serviceName string, clusters string, callbackFunc *func(service string, services []model.Instance, err error)) {
 	key := util.GetServiceCacheKey(serviceName, clusters)
 	defer ed.mux.Unlock()
 	ed.mux.Lock()
-	var funcSlice []*func(services []model.Instance, err error)
+	var funcSlice []*func(service string, services []model.Instance, err error)
 	old, ok := ed.callbackFuncMap.Get(key)
 	if ok {
-		funcSlice = append(funcSlice, old.([]*func(services []model.Instance, err error))...)
+		funcSlice = append(funcSlice, old.([]*func(service string, services []model.Instance, err error))...)
 	}
 	funcSlice = append(funcSlice, callbackFunc)
 	ed.callbackFuncMap.Set(key, funcSlice)
 }
 
-func (ed *SubscribeCallback) RemoveCallbackFunc(serviceName string, clusters string, callbackFunc *func(services []model.Instance, err error)) {
+func (ed *SubscribeCallback) RemoveCallbackFunc(serviceName string, clusters string, callbackFunc *func(service string, services []model.Instance, err error)) {
 	logger.Info("removing " + serviceName + " with " + clusters + " to listener map")
 	key := util.GetServiceCacheKey(serviceName, clusters)
 	funcs, ok := ed.callbackFuncMap.Get(key)
 	if ok && funcs != nil {
-		var newFuncs []*func(services []model.Instance, err error)
-		for _, funcItem := range funcs.([]*func(services []model.Instance, err error)) {
+		var newFuncs []*func(service string, services []model.Instance, err error)
+		for _, funcItem := range funcs.([]*func(service string, services []model.Instance, err error)) {
 			if funcItem != callbackFunc {
 				newFuncs = append(newFuncs, funcItem)
 			}
@@ -74,12 +74,12 @@ func (ed *SubscribeCallback) RemoveCallbackFunc(serviceName string, clusters str
 func (ed *SubscribeCallback) ServiceChanged(cacheKey string, service *model.Service) {
 	funcs, ok := ed.callbackFuncMap.Get(cacheKey)
 	if ok {
-		for _, funcItem := range funcs.([]*func(services []model.Instance, err error)) {
+		for _, funcItem := range funcs.([]*func(service string, services []model.Instance, err error)) {
 			if len(service.Hosts) == 0 {
-				(*funcItem)(service.Hosts, errors.New("[client.Subscribe] subscribe failed,hosts is empty"))
+				(*funcItem)(service.Name, service.Hosts, errors.New("[client.Subscribe] subscribe failed,hosts is empty"))
 				continue
 			}
-			(*funcItem)(service.Hosts, nil)
+			(*funcItem)(service.Name, service.Hosts, nil)
 		}
 	}
 }

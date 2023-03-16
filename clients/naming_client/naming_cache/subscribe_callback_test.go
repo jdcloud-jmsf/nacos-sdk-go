@@ -54,7 +54,7 @@ func TestEventDispatcher_AddCallbackFuncs(t *testing.T) {
 		ServiceName: "Test",
 		Clusters:    []string{"default"},
 		GroupName:   "public",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		SubscribeCallback: func(service string, services []model.Instance, err error) {
 			fmt.Println(util.ToJsonString(ed.callbackFuncMap))
 		},
 	}
@@ -94,7 +94,7 @@ func TestEventDispatcher_RemoveCallbackFuncs(t *testing.T) {
 		ServiceName: "Test",
 		Clusters:    []string{"default"},
 		GroupName:   "public",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		SubscribeCallback: func(service string, services []model.Instance, err error) {
 			fmt.Printf("func1:%s \n", util.ToJsonString(services))
 		},
 	}
@@ -105,7 +105,7 @@ func TestEventDispatcher_RemoveCallbackFuncs(t *testing.T) {
 		ServiceName: "Test",
 		Clusters:    []string{"default"},
 		GroupName:   "public",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		SubscribeCallback: func(service string, services []model.Instance, err error) {
 			fmt.Printf("func2:%s \n", util.ToJsonString(services))
 		},
 	}
@@ -154,7 +154,7 @@ func TestSubscribeCallback_ServiceChanged(t *testing.T) {
 		ServiceName: "Test",
 		Clusters:    []string{"default"},
 		GroupName:   "public",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		SubscribeCallback: func(service string, services []model.Instance, err error) {
 			log.Printf("func1:%s \n", util.ToJsonString(services))
 		},
 	}
@@ -164,7 +164,7 @@ func TestSubscribeCallback_ServiceChanged(t *testing.T) {
 		ServiceName: "Test",
 		Clusters:    []string{"default"},
 		GroupName:   "public",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		SubscribeCallback: func(string string, services []model.Instance, err error) {
 			log.Printf("func2:%s \n", util.ToJsonString(services))
 
 		},

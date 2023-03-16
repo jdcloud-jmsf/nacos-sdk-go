@@ -30,9 +30,9 @@ import (
 func main() {
 	//create ServerConfig
 	sc := []constant.ServerConfig{
-		*constant.NewServerConfig("11.50.138.130", 30368,
+		*constant.NewServerConfig("11.50.138.27", 31718,
 			constant.WithContextPath("/nacos"),
-			constant.WithGrpcPort(31138)),
+			constant.WithGrpcPort(31030)),
 	}
 
 	//create ClientConfig
@@ -45,6 +45,7 @@ func main() {
 		constant.WithLogLevel("debug"),
 		constant.WithUsername("nacos"),
 		constant.WithPassword("nacos"),
+		constant.WithUpdateCacheWhenEmpty(true),
 	)
 
 	// create naming client
@@ -90,82 +91,82 @@ func main() {
 	})
 
 	//DeRegister
-	deRegisterServiceInstance(client, vo.DeregisterInstanceParam{
-		Ip:          "10.0.0.10",
-		Port:        8848,
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Cluster:     "cluster-a",
-		Ephemeral:   true, //it must be true
-	})
+	//deRegisterServiceInstance(client, vo.DeregisterInstanceParam{
+	//	Ip:          "10.0.0.10",
+	//	Port:        8848,
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Cluster:     "cluster-a",
+	//	Ephemeral:   true, //it must be true
+	//})
 
 	time.Sleep(1 * time.Second)
 
-	//BatchRegister
-	batchRegisterServiceInstance(client, vo.BatchRegisterInstanceParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Instances: []vo.RegisterInstanceParam{{
-			Ip:          "10.0.0.10",
-			Port:        8848,
-			Weight:      10,
-			Enable:      true,
-			Healthy:     true,
-			Ephemeral:   true,
-			ClusterName: "cluster-a",
-			Metadata:    map[string]string{"idc": "shanghai"},
-		}, {
-			Ip:          "10.0.0.12",
-			Port:        8848,
-			Weight:      7,
-			Enable:      true,
-			Healthy:     true,
-			Ephemeral:   true,
-			ClusterName: "cluster-a",
-			Metadata:    map[string]string{"idc": "shanghai"},
-		}},
-	})
-
-	time.Sleep(1 * time.Second)
+	////BatchRegister
+	//batchRegisterServiceInstance(client, vo.BatchRegisterInstanceParam{
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Instances: []vo.RegisterInstanceParam{{
+	//		Ip:          "10.0.0.10",
+	//		Port:        8848,
+	//		Weight:      10,
+	//		Enable:      true,
+	//		Healthy:     true,
+	//		Ephemeral:   true,
+	//		ClusterName: "cluster-a",
+	//		Metadata:    map[string]string{"idc": "shanghai"},
+	//	}, {
+	//		Ip:          "10.0.0.12",
+	//		Port:        8848,
+	//		Weight:      7,
+	//		Enable:      true,
+	//		Healthy:     true,
+	//		Ephemeral:   true,
+	//		ClusterName: "cluster-a",
+	//		Metadata:    map[string]string{"idc": "shanghai"},
+	//	}},
+	//})
+	//
+	//time.Sleep(1 * time.Second)
 
 	//Get service with serviceName, groupName , clusters
-	getService(client, vo.GetServiceParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Clusters:    []string{"cluster-a"},
-	})
+	//getService(client, vo.GetServiceParam{
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Clusters:    []string{"cluster-a"},
+	//})
 
 	//SelectAllInstance
 	//GroupName=DEFAULT_GROUP
-	selectAllInstances(client, vo.SelectAllInstancesParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Clusters:    []string{"cluster-a"},
-	})
+	//selectAllInstances(client, vo.SelectAllInstancesParam{
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Clusters:    []string{"cluster-a"},
+	//})
 
 	//SelectInstances only return the instances of healthy=${HealthyOnly},enable=true and weight>0
 	//ClusterName=DEFAULT,GroupName=DEFAULT_GROUP
-	selectInstances(client, vo.SelectInstancesParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Clusters:    []string{"cluster-a"},
-	})
+	//selectInstances(client, vo.SelectInstancesParam{
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Clusters:    []string{"cluster-a"},
+	//})
 
 	//SelectOneHealthyInstance return one instance by WRR strategy for load balance
 	//And the instance should be health=true,enable=true and weight>0
 	//ClusterName=DEFAULT,GroupName=DEFAULT_GROUP
-	selectOneHealthyInstance(client, vo.SelectOneHealthInstanceParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		Clusters:    []string{"cluster-a"},
-	})
+	//selectOneHealthyInstance(client, vo.SelectOneHealthInstanceParam{
+	//	ServiceName: "demo.go",
+	//	GroupName:   "group-a",
+	//	Clusters:    []string{"cluster-a"},
+	//})
 
 	//Subscribe key=serviceName+groupName+cluster
 	//Note:We call add multiple SubscribeCallback with the same key.
 	subscribeParam := &vo.SubscribeParam{
-		ServiceName: "demo.go",
-		GroupName:   "group-a",
-		SubscribeCallback: func(services []model.Instance, err error) {
+		ServiceName: "jmsf-provider-demo",
+		GroupName:   "DEFAULT_GROUP",
+		SubscribeCallback: func(service string, services []model.Instance, err error) {
 			fmt.Printf("callback return services:%s \n\n", util.ToJsonString(services))
 		},
 	}
@@ -190,7 +191,7 @@ func main() {
 	})*/
 
 	//wait for client pull change from server
-	time.Sleep(3 * time.Second)
+	time.Sleep(10 * time.Minute)
 	// UnSubscribe
 	unSubscribe(client, subscribeParam)
 
