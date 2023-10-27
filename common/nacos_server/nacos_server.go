@@ -187,7 +187,7 @@ func (server *NacosServer) callServer(api string, params map[string]string, meth
 	if response.StatusCode == constant.RESPONSE_CODE_SUCCESS {
 		return
 	} else {
-		err = errors.New(fmt.Sprintf("request return error code %d", response.StatusCode))
+		err = errors.New(fmt.Sprintf("request return error code %d, result: %s", response.StatusCode, result))
 		return
 	}
 }
